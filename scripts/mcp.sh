@@ -1,9 +1,41 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+resolve_script_dir() {
+  local src="${BASH_SOURCE[0]}"
+  while [[ -h "${src}" ]]; do
+    local dir
+    dir="$(cd -P "$(dirname "${src}")" && pwd)"
+    src="$(readlink "${src}")"
+    [[ "${src}" != /* ]] && src="${dir}/${src}"
+  done
+  cd -P "$(dirname "${src}")" && pwd
+}
+
+SCRIPT_DIR="$(resolve_script_dir)"
 SKILL_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-CONFIG_PATH="${SKILL_DIR}/mcporter.json"
+SKILL_NAME="$(basename "${SKILL_DIR}")"
+
+resolve_config_path() {
+  local -a candidates=()
+  [[ -n "${MCPORTER_CONFIG:-}" ]] && candidates+=("${MCPORTER_CONFIG}")
+  [[ -n "${OPENCLAW_MCPORTER_CONFIG:-}" ]] && candidates+=("${OPENCLAW_MCPORTER_CONFIG}")
+  candidates+=(
+    "${SKILL_DIR}/mcporter.json"
+    "${HOME}/.openclaw/skills/${SKILL_NAME}/mcporter.json"
+    "$(pwd)/mcporter.json"
+  )
+
+  local p
+  for p in "${candidates[@]}"; do
+    [[ -n "${p}" && -f "${p}" ]] && { echo "${p}"; return 0; }
+  done
+
+  echo "${SKILL_DIR}/mcporter.json"
+  return 1
+}
+
+CONFIG_PATH="$(resolve_config_path || true)"
 
 if ! command -v mcporter >/dev/null 2>&1; then
   echo "[mcp] missing binary: mcporter" >&2
@@ -17,7 +49,8 @@ fi
 
 if [[ ! -f "${CONFIG_PATH}" ]]; then
   echo "[mcp] missing config file: ${CONFIG_PATH}" >&2
-  echo "[mcp] 请将用户提供的 mcporter.json 复制到技能目录。" >&2
+  echo "[mcp] expected skill root config: ${SKILL_DIR}/mcporter.json" >&2
+  echo "[mcp] 可选覆盖: MCPORTER_CONFIG 或 OPENCLAW_MCPORTER_CONFIG" >&2
   exit 1
 fi
 
