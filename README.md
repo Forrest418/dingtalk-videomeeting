@@ -18,3 +18,14 @@
 ## 技术支持
 
 https://forreststudio.feishu.cn/drive/folder/Ma3Rf6gOclsxDQdpR7Aci8aCnbc
+
+
+## 相关技能仓库
+
+- dingtalk-contacts: https://github.com/Forrest418/dingtalk-contacts
+- dingtalk-teambition: https://github.com/Forrest418/dingtalk-teambition
+- dingtalk-chatgroup: https://github.com/Forrest418/dingtalk-chatgroup
+- dingtalk-calendar: https://github.com/Forrest418/dingtalk-calendar
+- dingtalk-attendance: https://github.com/Forrest418/dingtalk-attendance
+- dingtalk-videomeeting: https://github.com/Forrest418/dingtalk-videomeeting
+- dingtalk-amap: https://github.com/Forrest418/dingtalk-amap
