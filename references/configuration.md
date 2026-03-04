@@ -1,0 +1,24 @@
+# Configuration
+
+## Required file
+
+- `./mcporter.json`
+
+## Template
+
+```json
+{
+  "mcpServers": {
+    "钉钉视频会议": {
+      "type": "streamable-http",
+      "url": "https://mcp-gw.dingtalk.com/server/<serverId>?key=<key>"
+    }
+  }
+}
+```
+
+## Verify
+
+```bash
+./scripts/preflight.sh
+```
