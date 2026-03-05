@@ -9,7 +9,7 @@
   "mcpServers": {
     "钉钉视频会议": {
       "type": "streamable-http",
-      "url": "https://mcp-gw.dingtalk.com/server/48b502655627cd04cff2a05c797acb3fbe19a2bae98cf3916486dc65911df2b4?key=e76a4f8c3072588840c9e028e9418dab"
+      "url": "https://mcp-gw.dingtalk.com/server/<serverId>?key=<key>"
     }
   }
 }
