@@ -16,10 +16,20 @@ SCRIPT_DIR="$(resolve_script_dir)"
 SKILL_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SKILL_NAME="$(basename "${SKILL_DIR}")"
 
+OPENCLAW_HOME="${OPENCLAW_HOME:-${HOME}/.openclaw}"
+
 resolve_config_path() {
   local -a candidates=()
   [[ -n "${MCPORTER_CONFIG:-}" ]] && candidates+=("${MCPORTER_CONFIG}")
   [[ -n "${OPENCLAW_MCPORTER_CONFIG:-}" ]] && candidates+=("${OPENCLAW_MCPORTER_CONFIG}")
+
+  # 主配置目录优先
+  candidates+=(
+    "${OPENCLAW_HOME}/config/mcporter.json"
+    "${OPENCLAW_HOME}/workspace/config/mcporter.json"
+  )
+
+  # 技能根目录兜底
   candidates+=(
     "${SKILL_DIR}/mcporter.json"
     "${HOME}/.openclaw/skills/${SKILL_NAME}/mcporter.json"
@@ -31,11 +41,16 @@ resolve_config_path() {
     [[ -n "${p}" && -f "${p}" ]] && { echo "${p}"; return 0; }
   done
 
-  echo "${SKILL_DIR}/mcporter.json"
+  echo "${OPENCLAW_HOME}/config/mcporter.json"
   return 1
 }
 
 CONFIG_PATH="$(resolve_config_path || true)"
+
+if [[ "${1:-}" == "--print-config-path" ]]; then
+  echo "${CONFIG_PATH}"
+  exit 0
+fi
 
 if ! command -v mcporter >/dev/null 2>&1; then
   echo "[mcp] missing binary: mcporter" >&2
@@ -49,7 +64,7 @@ fi
 
 if [[ ! -f "${CONFIG_PATH}" ]]; then
   echo "[mcp] missing config file: ${CONFIG_PATH}" >&2
-  echo "[mcp] expected skill root config: ${SKILL_DIR}/mcporter.json" >&2
+  echo "[mcp] search order: ${OPENCLAW_HOME}/config/mcporter.json -> ${OPENCLAW_HOME}/workspace/config/mcporter.json -> ${SKILL_DIR}/mcporter.json" >&2
   echo "[mcp] 可选覆盖: MCPORTER_CONFIG 或 OPENCLAW_MCPORTER_CONFIG" >&2
   exit 1
 fi

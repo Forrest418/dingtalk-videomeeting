@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-CONFIG_PATH="${SKILL_DIR}/mcporter.json"
+CONFIG_PATH="$(${SCRIPT_DIR}/mcp.sh --print-config-path 2>/dev/null || true)"
 SERVER="$(${SCRIPT_DIR}/resolve_server.sh "${1:-}")"
 
 if ! command -v mcporter >/dev/null 2>&1; then
@@ -16,8 +16,9 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 2
 fi
 
-if [[ ! -f "${CONFIG_PATH}" ]]; then
-  echo "[preflight] missing config file: ${CONFIG_PATH}" >&2
+if [[ -z "${CONFIG_PATH}" || ! -f "${CONFIG_PATH}" ]]; then
+  echo "[preflight] missing config file." >&2
+  echo "[preflight] search order: ${OPENCLAW_HOME:-$HOME/.openclaw}/config/mcporter.json -> ${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/config/mcporter.json -> ${SKILL_DIR}/mcporter.json" >&2
   exit 1
 fi
 
